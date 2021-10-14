@@ -10,6 +10,7 @@ class Comments extends ActiveRecordEntity
     protected $articleId;
     protected $text;
     protected $publishedAt;
+    protected $editedAt;
     /**
      * @return int
      */
@@ -36,7 +37,7 @@ class Comments extends ActiveRecordEntity
         return $this->text;
     }
     /**
-     * @return \DateTime
+     * @return string
      */
     public function getPublishedAt() : string
     {
@@ -44,11 +45,24 @@ class Comments extends ActiveRecordEntity
         return $date->format('H:i M d,Y');
     }
     /**
-     * @param int $authorId
+     * @return mixed
      */
-    public function setAuthorId(int $authorId): void
+    public function getEditedAt() : string
     {
-        $this->authorId = $authorId;
+        $editedDate = new \DateTime($this->editedAt);
+        $pubDate = new \DateTime($this->publishedAt);
+
+        if ($editedDate == ($pubDate)) {
+            return '';
+        }
+        return $editedDate->format('H:i M d,Y');
+    }
+    /**
+     * @param user $author
+     */
+    public function setAuthorId(user $author): void
+    {
+        $this->authorId = $author->getId();
     }
     /**
      * @param int $articleId
@@ -65,17 +79,50 @@ class Comments extends ActiveRecordEntity
         $this->text = $text;
     }
 
+    /**
+     * @param mixed $editedAt
+     */
+    public function setEditedAt($editedAt): void
+    {
+        $this->editedAt = $editedAt;
+    }
+
     protected static function getTableName(): string
     {
         return 'comments';
     }
 
-    public static function createFromArray(array $fields, User $user)
+    public static function createComment(array $fields, User $user) : Comments
     {
         if (empty($fields['text'])) {
             throw new InvalidArgumentException('Не передан текст комментария.');
         }
 
+        $comment = new Comments();
+
+        $comment->setArticleId($_POST['articleId']);
+        $comment->setAuthorId($user);
+        $comment->setText($fields['text']);
+
+        $comment->save();
+
+        return $comment;
+
+    }
+
+    public function updateComment(array $fields) : Comments
+    {
+        if (empty($fields['text'])) {
+            throw new InvalidArgumentException('Не передан текст комментария.');
+        }
+        $date = new \DateTime();
+        $date->add(new \DateInterval('PT1H'));
+
+        $this->setText($fields['text']);
+        $this->setEditedAt($date->format('Y-m-d H:i:s'));
+        $this->save();
+
+        return $this;
     }
 
 }

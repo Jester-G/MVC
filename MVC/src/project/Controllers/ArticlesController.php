@@ -136,9 +136,9 @@ class ArticlesController extends AbstractController
             throw new UnauthorizedException();
         }
 
-        if (!$this->user->isAdmin()) {
+        /*if (!$this->user->isAdmin()) {
             throw new ForbiddenException('Only a user with admin rights can add articles.');
-        }
+        }*/
 
         if (!empty($_POST)) {
             try {
@@ -174,30 +174,10 @@ class ArticlesController extends AbstractController
         }
 
         $article->delete();
+
+        header('Location: /ex4/ex5/another_MVC/www/', true, 302);
+        exit();
         var_dump($article);
     }
 
-    public function addComment(int $articleId) : void
-    {
-        $article = Article::getById($articleId);
-
-        if ($article === null) {
-            $main = new MainController();
-            $main->error();
-        }
-
-        if ($this->user === null) {
-            throw new UserNotFoundException('User not found btw.');
-        }
-
-        if (!empty($_POST)) {
-            try {
-                $comment = Comments::createFromArray($_POST, $this->user);
-            } catch (InvalidArgumentException $e) {
-                $this->view->setVar('error', $e->getMessage());
-                $this->view($articleId);
-                return;
-            }
-        }
-    }
 }

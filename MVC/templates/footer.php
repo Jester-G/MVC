@@ -4,6 +4,7 @@
         <div class="sidebarHeader">Menu</div>
         <ul>
             <li><a href="/ex4/ex5/another_MVC/www/">Main page</a></li>
+            <li><a href="/ex4/ex5/another_MVC/www/articles/add">Add Article</a></li>
             <?php if (empty($user)) :?>
             <li><a href="/ex4/ex5/another_MVC/www/users/login">Login</a></li>
             <li><a href="/ex4/ex5/another_MVC/www/users/register">Register</a></li>
